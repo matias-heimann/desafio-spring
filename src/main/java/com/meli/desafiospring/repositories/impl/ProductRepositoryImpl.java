@@ -2,6 +2,7 @@ package com.meli.desafiospring.repositories.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.meli.desafiospring.exceptions.NotFoundProductException;
 import com.meli.desafiospring.model.ProductDAO;
 import com.meli.desafiospring.repositories.ProductRepository;
 import com.meli.desafiospring.utils.FilterRepositoryUtil;
@@ -48,6 +49,19 @@ public class ProductRepositoryImpl implements ProductRepository {
                     .collect(Collectors.toList());
         }
         return productsAux.stream().sorted(this.sorters.get(order)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductDAO> getByIds(List<Integer> ids) throws NotFoundProductException {
+        List<ProductDAO> productDAOS = new LinkedList<>();
+        for(Integer i: ids){
+            ProductDAO productDAO = this.products.get(i);
+            if(productDAO == null){
+                throw new NotFoundProductException("Article with id " + i + " doesn't exist");
+            }
+            productDAOS.add(productDAO);
+        }
+        return productDAOS;
     }
 
     private void addFilters(){

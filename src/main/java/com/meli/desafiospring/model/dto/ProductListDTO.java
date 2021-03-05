@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class ProductDTO {
+public class ProductListDTO {
 
     private Integer id;
     private String name;
@@ -16,7 +16,7 @@ public class ProductDTO {
     private Integer quantity;
     private Integer prestige;
 
-    public ProductDTO(ProductDAO product){
+    public ProductListDTO(ProductDAO product){
         this.id = product.getId();
         this.name = product.getName();
         this.category = product.getCategory();
