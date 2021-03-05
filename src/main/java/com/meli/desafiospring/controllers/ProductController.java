@@ -1,13 +1,65 @@
 package com.meli.desafiospring.controllers;
 
+import com.meli.desafiospring.exceptions.BaseException;
+import com.meli.desafiospring.model.dto.ErrorDTO;
+import com.meli.desafiospring.model.dto.ProductDTO;
 import com.meli.desafiospring.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 @RestController
+@RequestMapping("/api/v1")
 public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @GetMapping("/articles")
+    public List<ProductDTO> getProducts(@RequestParam(defaultValue = "", required = false) String category,
+                                                  @RequestParam(defaultValue = "", required = false) String name,
+                                                  @RequestParam(defaultValue = "", required = false) String brand,
+                                                  @RequestParam(defaultValue = "", required = false) Integer price,
+                                                  @RequestParam(defaultValue = "", required = false) Integer maxPrice,
+                                                  @RequestParam(defaultValue = "", required = false) Integer minPrice,
+                                                  @RequestParam(defaultValue = "", required = false) Boolean freeShiping,
+                                                  @RequestParam(defaultValue = "", required = false) Integer prestige,
+                                                  @RequestParam(defaultValue = "4", required = false) Integer order){
+        HashMap<String, Object> filters = new HashMap<>();
+        if(!name.equals("")){
+            filters.put("name", name.toLowerCase(Locale.ROOT));
+        }
+        if(!category.equals("")){
+            filters.put("category", category.toLowerCase(Locale.ROOT));
+        }
+        if(!brand.equals("")){
+            filters.put("brand", brand.toLowerCase(Locale.ROOT));
+        }
+        if(price != null){
+            filters.put("price", price);
+        }
+        if(maxPrice != null){
+            filters.put("maxPrice", maxPrice);
+        }
+        if(minPrice != null){
+            filters.put("minPrice", minPrice);
+        }
+        if(freeShiping != null){
+            filters.put("freeShiping", freeShiping);
+        }
+        if(prestige != null){
+            filters.put("prestige", prestige);
+        }
+        return this.productService.getProducts(filters, order);
+    }
+
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<ErrorDTO> handleException(BaseException baseException){
+        return new ResponseEntity<>(new ErrorDTO("Error", baseException.getMessage()), baseException.getStatus());
+    }
 
 }
