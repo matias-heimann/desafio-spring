@@ -1,0 +1,122 @@
+[
+    {
+        "id": 0,
+        "freeShiping": true,
+        "category": "Herramientas",
+        "name": "Desmalezadora",
+        "brand": "Makita",
+        "price": 9600,
+        "quantity": 5,
+        "prestige": 4
+    },
+    {
+        "id": 1,
+        "freeShiping": true,
+        "category": "Deportes",
+        "name": "Taladro",
+        "brand": "Black & Decker",
+        "price": 12500,
+        "quantity": 7,
+        "prestige": 4
+    },
+    {
+        "id": 2,
+        "freeShiping": true,
+        "category": "Herramientas",
+        "name": "Soldadora",
+        "brand": "Black & Decker",
+        "price": 7215,
+        "quantity": 10,
+        "prestige": 3
+    },
+    {
+        "id": 3,
+        "freeShiping": true,
+        "category": "Deportes",
+        "name": "Zapatillas Deportivas",
+        "brand": "Nike",
+        "price": 14000,
+        "quantity": 4,
+        "prestige": 5
+    },
+    {
+        "id": 4,
+        "freeShiping": true,
+        "category": "Deportes",
+        "name": "Zapatillas Deportivas",
+        "brand": "Adidas",
+        "price": 13650,
+        "quantity": 6,
+        "prestige": 5
+    },
+    {
+        "id": 5,
+        "freeShiping": false,
+        "category": "Deportes",
+        "name": "Camiseta",
+        "brand": "Topper",
+        "price": 2300,
+        "quantity": 2,
+        "prestige": 3
+    },
+    {
+        "id": 6,
+        "freeShiping": true,
+        "category": "Celulares",
+        "name": "Redmi Note 9",
+        "brand": "Xiaomi",
+        "price": 40000,
+        "quantity": 15,
+        "prestige": 4
+    },
+    {
+        "id": 7,
+        "freeShiping": false,
+        "category": "Celulares",
+        "name": "Smartwatch",
+        "brand": "Noga",
+        "price": 1900,
+        "quantity": 20,
+        "prestige": 2
+    },
+    {
+        "id": 8,
+        "freeShiping": false,
+        "category": "Indumentaria",
+        "name": "Remera",
+        "brand": "Taverniti",
+        "price": 2300,
+        "quantity": 2,
+        "prestige": 3
+    },
+    {
+        "id": 9,
+        "freeShiping": false,
+        "category": "Indumentaria",
+        "name": "Chomba",
+        "brand": "Taverniti",
+        "price": 2400,
+        "quantity": 6,
+        "prestige": 3
+    },
+    {
+        "id": 10,
+        "freeShiping": false,
+        "category": "Indumentaria",
+        "name": "Medias",
+        "brand": "Mistral",
+        "price": 500,
+        "quantity": 8,
+        "prestige": 1
+    },
+    {
+        "id": 11,
+        "freeShiping": true,
+        "category": "Indumentaria",
+        "name": "Short",
+        "brand": "Lacoste",
+        "price": 3900,
+        "quantity": 9,
+        "prestige": 3
+    }
+]
