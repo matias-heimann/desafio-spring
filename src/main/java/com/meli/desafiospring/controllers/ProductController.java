@@ -1,6 +1,7 @@
 package com.meli.desafiospring.controllers;
 
 import com.meli.desafiospring.exceptions.BaseException;
+import com.meli.desafiospring.exceptions.NotEnoughProductsException;
 import com.meli.desafiospring.exceptions.NotFoundProductException;
 import com.meli.desafiospring.model.PurchaseArticles;
 import com.meli.desafiospring.model.dto.BuyOrderDTO;
@@ -64,7 +65,8 @@ public class ProductController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/purchase-request")
-    public BuyOrderDTO purchaseItems(@RequestBody PurchaseArticles products) throws NotFoundProductException {
+    public BuyOrderDTO purchaseItems(@RequestBody PurchaseArticles products) throws NotFoundProductException,
+            NotEnoughProductsException {
         return this.productService.purchaseItems(products);
     }
 
