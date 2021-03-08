@@ -5,7 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meli.desafiospring.exceptions.NotFoundProductException;
 import com.meli.desafiospring.model.ProductDAO;
 import com.meli.desafiospring.repositories.ProductRepository;
-import com.meli.desafiospring.utils.FilterRepositoryUtil;
+import com.meli.desafiospring.utils.FilterProductRepositoryUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
@@ -18,15 +19,18 @@ import java.util.stream.Collectors;
 public class ProductRepositoryImpl implements ProductRepository {
 
     private HashMap<Integer, ProductDAO> products;
-    private HashMap<String, Function<FilterRepositoryUtil, Boolean>> filters;
+    private HashMap<String, Function<FilterProductRepositoryUtil, Boolean>> filters;
     private HashMap<Integer, Comparator<ProductDAO>> sorters;
+    @Value("${products-json}")
+    private String filename;
 
 
     public ProductRepositoryImpl() throws IOException {
+        this.filename = "src/main/resources/static/products.json";
         products = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
-        List<ProductDAO> productList = objectMapper.readValue(new File("src/main/resources/static/products.json"),
-                new TypeReference<List<ProductDAO>>(){});
+        List<ProductDAO> productList = objectMapper.readValue(new File(filename),
+                new TypeReference<>(){});
         for(ProductDAO productDAO: productList){
             products.put(productDAO.getId(), productDAO);
         }
@@ -45,7 +49,7 @@ public class ProductRepositoryImpl implements ProductRepository {
         for(Map.Entry<String, Object> entry: filters.entrySet()){
             productsAux = productsAux.stream().filter(p -> this.filters
                     .get(entry.getKey())
-                    .apply(new FilterRepositoryUtil(p, entry.getValue())))
+                    .apply(new FilterProductRepositoryUtil(p, entry.getValue())))
                     .collect(Collectors.toList());
         }
         return productsAux.stream().sorted(this.sorters.get(order)).collect(Collectors.toList());
@@ -66,35 +70,35 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     private void addFilters(){
         filters = new HashMap<>();
-        filters.put("name", (FilterRepositoryUtil filter) -> filter
+        filters.put("name", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getName().toLowerCase(Locale.ROOT)
                 .equals(filter.getFilter()));
-        filters.put("category", (FilterRepositoryUtil filter) -> filter
+        filters.put("category", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getCategory().toLowerCase(Locale.ROOT)
                 .equals(filter.getFilter()));
-        filters.put("brand", (FilterRepositoryUtil filter) -> filter
+        filters.put("brand", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getBrand().toLowerCase(Locale.ROOT)
                 .equals(filter.getFilter()));
-        filters.put("maxPrice", (FilterRepositoryUtil filter) -> filter
+        filters.put("maxPrice", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getPrice()
                 .equals(filter.getFilter()));
-        filters.put("maxPrice", (FilterRepositoryUtil filter) -> (filter
+        filters.put("maxPrice", (FilterProductRepositoryUtil filter) -> (filter
                 .getProductDAO()
                 .getPrice()
                 .compareTo((Integer) filter.getFilter()) < 0));
-        filters.put("minPrice", (FilterRepositoryUtil filter) -> (filter
+        filters.put("minPrice", (FilterProductRepositoryUtil filter) -> (filter
                 .getProductDAO()
                 .getPrice()
                 .compareTo((Integer) filter.getFilter()) > 0));
-        filters.put("freeShiping", (FilterRepositoryUtil filter) -> filter
+        filters.put("freeShiping", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getFreeShiping()
                 .equals(filter.getFilter()));
-        filters.put("prestige", (FilterRepositoryUtil filter) -> filter
+        filters.put("prestige", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getPrestige()
                 .equals(filter.getFilter()));

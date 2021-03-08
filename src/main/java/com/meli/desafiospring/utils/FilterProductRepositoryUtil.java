@@ -4,12 +4,12 @@ import com.meli.desafiospring.model.ProductDAO;
 import lombok.Getter;
 
 @Getter
-public class FilterRepositoryUtil {
+public class FilterProductRepositoryUtil {
 
     private ProductDAO productDAO;
     private Object filter;
 
-    public FilterRepositoryUtil(ProductDAO productDAO, Object filter) {
+    public FilterProductRepositoryUtil(ProductDAO productDAO, Object filter) {
         this.productDAO = productDAO;
         this.filter = filter;
     }
