@@ -16,12 +16,6 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    private Integer purchases;
-
-    public ProductServiceImpl(){
-        this.purchases = 0;
-    }
-
     @Override
     public List<ProductListDTO> getProducts(HashMap<String, String> filters) throws FilterNotValidException {
         int order = 4;

@@ -9,31 +9,31 @@ import com.meli.desafiospring.utils.FilterUserRepositoryUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Repository
+@Component
 public class UserRepositoryImpl implements UserRepository {
 
     private HashMap<Integer, UserDao> users;
     private HashMap<String, Function<FilterUserRepositoryUtil, Boolean>> filters;
-
+    private Properties properties = new Properties();
     @Value("${users-json}")
     private String filename;
 
     public UserRepositoryImpl() throws IOException {
-        System.out.println(filename);
+        filename = "src/main/resources/static/users.json";
         this.addFilters();
-        this.filename = "src/main/resources/static/users.json";
         this.users = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
         List<UserDao> userList = objectMapper.readValue(new File(this.filename),

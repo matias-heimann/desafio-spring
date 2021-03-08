@@ -28,7 +28,6 @@ public class ProductController extends BaseController{
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("")
     public List<ProductListDTO> getProducts(@RequestParam HashMap<String, String> filters) throws FilterNotValidException {
-        System.out.println(filters);
         return this.productService.getProducts(filters);
     }
 
