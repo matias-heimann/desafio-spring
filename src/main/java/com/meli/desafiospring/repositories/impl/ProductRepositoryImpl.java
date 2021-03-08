@@ -2,6 +2,7 @@ package com.meli.desafiospring.repositories.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.meli.desafiospring.exceptions.FilterNotValidException;
 import com.meli.desafiospring.exceptions.NotFoundProductException;
 import com.meli.desafiospring.model.ProductDAO;
 import com.meli.desafiospring.repositories.ProductRepository;
@@ -44,13 +45,21 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public List<ProductDAO> getWithFilterAndOrder(HashMap<String, Object> filters, Integer order) {
+    public List<ProductDAO> getWithFilterAndOrder(HashMap<String, String> filters, Integer order) throws FilterNotValidException {
         List<ProductDAO> productsAux = this.products.values().stream().collect(Collectors.toList());
-        for(Map.Entry<String, Object> entry: filters.entrySet()){
-            productsAux = productsAux.stream().filter(p -> this.filters
-                    .get(entry.getKey())
-                    .apply(new FilterProductRepositoryUtil(p, entry.getValue())))
-                    .collect(Collectors.toList());
+        for(Map.Entry<String, String> entry: filters.entrySet()){
+            if(this.filters.get(entry.getKey()) == null){
+                throw new FilterNotValidException("Filter with name " + entry.getKey() + " is not valid");
+            }
+            try {
+                productsAux = productsAux.stream().filter(p -> this.filters
+                        .get(entry.getKey())
+                        .apply(new FilterProductRepositoryUtil(p, entry.getValue())))
+                        .collect(Collectors.toList());
+            }
+            catch (NumberFormatException numberFormatException){
+                throw new FilterNotValidException(entry.getValue() + " is not a valid format for filter " + entry.getKey());
+            }
         }
         return productsAux.stream().sorted(this.sorters.get(order)).collect(Collectors.toList());
     }
@@ -73,41 +82,41 @@ public class ProductRepositoryImpl implements ProductRepository {
         filters.put("name", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getName().toLowerCase(Locale.ROOT)
-                .equals(filter.getFilter()));
+                .equals(filter.getFilter().toString().toLowerCase(Locale.ROOT)));
         filters.put("category", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getCategory().toLowerCase(Locale.ROOT)
-                .equals(filter.getFilter()));
+                .equals(filter.getFilter().toString().toLowerCase(Locale.ROOT)));
         filters.put("brand", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getBrand().toLowerCase(Locale.ROOT)
-                .equals(filter.getFilter()));
+                .equals(filter.getFilter().toString().toLowerCase(Locale.ROOT)));
         filters.put("maxPrice", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getPrice()
-                .equals(filter.getFilter()));
+                .equals(Integer.valueOf(filter.getFilter().toString())));
         filters.put("maxPrice", (FilterProductRepositoryUtil filter) -> (filter
                 .getProductDAO()
                 .getPrice()
-                .compareTo((Integer) filter.getFilter()) < 0));
+                .compareTo(Integer.valueOf(filter.getFilter().toString())) < 0));
         filters.put("minPrice", (FilterProductRepositoryUtil filter) -> (filter
                 .getProductDAO()
                 .getPrice()
-                .compareTo((Integer) filter.getFilter()) > 0));
+                .compareTo(Integer.valueOf(filter.getFilter().toString())) > 0));
         filters.put("freeShiping", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getFreeShiping()
-                .equals(filter.getFilter()));
+                .equals(Boolean.valueOf(filter.getFilter().toString())));
         filters.put("prestige", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getPrestige()
-                .equals(filter.getFilter()));
+                .equals(Integer.valueOf(filter.getFilter().toString())));
     }
 
     private void addSorters(){
         sorters = new HashMap<>();
-        sorters.put(0, (p1, p2) -> p1.getName().compareTo(p2.getName()));
-        sorters.put(1, (p1, p2) -> p2.getName().compareTo(p1.getName()));
+        sorters.put(0, (p1, p2) -> p1.getName().toLowerCase(Locale.ROOT).compareTo(p2.getName().toLowerCase(Locale.ROOT)));
+        sorters.put(1, (p1, p2) -> p2.getName().toLowerCase(Locale.ROOT).compareTo(p1.getName().toLowerCase(Locale.ROOT)));
         sorters.put(2, (p1, p2) -> p2.getPrice().compareTo(p1.getPrice()));
         sorters.put(3, (p1, p2) -> p1.getPrice().compareTo(p2.getPrice()));
         sorters.put(4, (p1, p2) -> p2.getPrestige().compareTo(p1.getPrestige()));

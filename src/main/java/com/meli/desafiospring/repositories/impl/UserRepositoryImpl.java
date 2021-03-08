@@ -2,7 +2,7 @@ package com.meli.desafiospring.repositories.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.meli.desafiospring.exceptions.FilterNotExistException;
+import com.meli.desafiospring.exceptions.FilterNotValidException;
 import com.meli.desafiospring.model.UserDao;
 import com.meli.desafiospring.repositories.UserRepository;
 import com.meli.desafiospring.utils.FilterUserRepositoryUtil;
@@ -26,7 +26,8 @@ public class UserRepositoryImpl implements UserRepository {
 
     private HashMap<Integer, UserDao> users;
     private HashMap<String, Function<FilterUserRepositoryUtil, Boolean>> filters;
-    @Value( "${users-json}" )
+
+    @Value("${users-json}")
     private String filename;
 
     public UserRepositoryImpl() throws IOException {
@@ -62,15 +63,20 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<UserDao> getUsers(HashMap<String, Object> filters) throws FilterNotExistException {
+    public List<UserDao> getUsers(HashMap<String, String> filters) throws FilterNotValidException {
         List<UserDao> userDaos = this.users.values().stream().collect(Collectors.toList());
-        for(Map.Entry<String, Object> entry: filters.entrySet()){
+        for(Map.Entry<String, String> entry: filters.entrySet()){
             if(this.filters.get(entry.getKey()) == null){
-                throw new FilterNotExistException("Filter with name " + entry.getKey() + " is not valid");
+                throw new FilterNotValidException("Filter with name " + entry.getKey() + " is not valid");
             }
-            userDaos = userDaos.stream().filter(u -> this.filters.get(entry.getKey())
-                    .apply(new FilterUserRepositoryUtil(u, entry.getValue())))
-                    .collect(Collectors.toList());
+            try {
+                userDaos = userDaos.stream().filter(u -> this.filters.get(entry.getKey())
+                        .apply(new FilterUserRepositoryUtil(u, entry.getValue())))
+                        .collect(Collectors.toList());
+            }
+            catch (NumberFormatException numberFormatException){
+                throw new FilterNotValidException(entry.getValue() + " is not a valid format for filter " + entry.getKey());
+            }
         }
         return userDaos;
     }
@@ -110,7 +116,7 @@ public class UserRepositoryImpl implements UserRepository {
     private void addFilters(){
         this.filters = new HashMap<>();
         this.filters.put("id", (FilterUserRepositoryUtil filter) ->
-                filter.getProductDAO().getId().equals((Integer) filter.getFilter()));
+                filter.getProductDAO().getId().equals(Integer.valueOf(filter.getFilter().toString())));
         this.filters.put("name", (FilterUserRepositoryUtil filter) ->
                 filter.getProductDAO()
                         .getName()

@@ -1,6 +1,6 @@
 package com.meli.desafiospring.services.impl;
 
-import com.meli.desafiospring.exceptions.FilterNotExistException;
+import com.meli.desafiospring.exceptions.FilterNotValidException;
 import com.meli.desafiospring.exceptions.NotValidInformationForNewUserException;
 import com.meli.desafiospring.model.NewUser;
 import com.meli.desafiospring.model.UserDao;
@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,7 +48,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getUsers(HashMap<String, Object> filters) throws FilterNotExistException {
+    public List<UserDTO> getUsers(HashMap<String, String> filters) throws FilterNotValidException {
+        for(Map.Entry<String, String> entry: filters.entrySet()){
+            filters.put(entry.getKey(), entry.getValue().toLowerCase(Locale.ROOT));
+        }
         List<UserDao> userDaos = this.userRepository.getUsers(filters);
         return userDaos.stream().map(u -> new UserDTO(u.getId(), u.getName(), u.getEmail(), u.getCountry(), u.getProvince(), u.getCity()))
                 .collect(Collectors.toList());

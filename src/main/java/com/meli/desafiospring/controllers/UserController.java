@@ -1,6 +1,6 @@
 package com.meli.desafiospring.controllers;
 
-import com.meli.desafiospring.exceptions.FilterNotExistException;
+import com.meli.desafiospring.exceptions.FilterNotValidException;
 import com.meli.desafiospring.exceptions.NotValidInformationForNewUserException;
 import com.meli.desafiospring.model.NewUser;
 import com.meli.desafiospring.model.dto.UserDTO;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -29,31 +28,7 @@ public class UserController extends BaseController{
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("")
-    public List<UserDTO> getUsers(@RequestParam(required = false, defaultValue = "") Integer id,
-                                  @RequestParam(required = false, defaultValue = "") String name,
-                                  @RequestParam(required = false, defaultValue = "") String email,
-                                  @RequestParam(required = false, defaultValue = "") String country,
-                                  @RequestParam(required = false, defaultValue = "") String province,
-                                  @RequestParam(required = false, defaultValue = "") String city) throws FilterNotExistException {
-        HashMap<String, Object> filter = new HashMap<>();
-        if(id != null){
-            filter.put("id", id);
-        }
-        if(!name.equals("")){
-            filter.put("name", name.toLowerCase(Locale.ROOT));
-        }
-        if(!email.equals("")){
-            filter.put("email", email.toLowerCase(Locale.ROOT));
-        }
-        if(!country.equals("")){
-            filter.put("country", country.toLowerCase(Locale.ROOT));
-        }
-        if(!province.equals("")){
-            filter.put("province", province.toLowerCase(Locale.ROOT));
-        }
-        if(!city.equals("")){
-            filter.put("city", city.toLowerCase(Locale.ROOT));
-        }
-        return this.userService.getUsers(filter);
+    public List<UserDTO> getUsers(@RequestParam HashMap<String, String> filters) throws FilterNotValidException {
+        return this.userService.getUsers(filters);
     }
 }

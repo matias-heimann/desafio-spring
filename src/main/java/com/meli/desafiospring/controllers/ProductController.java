@@ -1,6 +1,7 @@
 package com.meli.desafiospring.controllers;
 
 import com.meli.desafiospring.exceptions.BaseException;
+import com.meli.desafiospring.exceptions.FilterNotValidException;
 import com.meli.desafiospring.exceptions.NotEnoughProductsException;
 import com.meli.desafiospring.exceptions.NotFoundProductException;
 import com.meli.desafiospring.model.PurchaseArticles;
@@ -26,41 +27,9 @@ public class ProductController extends BaseController{
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("")
-    public List<ProductListDTO> getProducts(@RequestParam(defaultValue = "", required = false) String category,
-                                            @RequestParam(defaultValue = "", required = false) String name,
-                                            @RequestParam(defaultValue = "", required = false) String brand,
-                                            @RequestParam(defaultValue = "", required = false) Integer price,
-                                            @RequestParam(defaultValue = "", required = false) Integer maxPrice,
-                                            @RequestParam(defaultValue = "", required = false) Integer minPrice,
-                                            @RequestParam(defaultValue = "", required = false) Boolean freeShiping,
-                                            @RequestParam(defaultValue = "", required = false) Integer prestige,
-                                            @RequestParam(defaultValue = "4", required = false) Integer order){
-        HashMap<String, Object> filters = new HashMap<>();
-        if(!name.equals("")){
-            filters.put("name", name.toLowerCase(Locale.ROOT));
-        }
-        if(!category.equals("")){
-            filters.put("category", category.toLowerCase(Locale.ROOT));
-        }
-        if(!brand.equals("")){
-            filters.put("brand", brand.toLowerCase(Locale.ROOT));
-        }
-        if(price != null){
-            filters.put("price", price);
-        }
-        if(maxPrice != null){
-            filters.put("maxPrice", maxPrice);
-        }
-        if(minPrice != null){
-            filters.put("minPrice", minPrice);
-        }
-        if(freeShiping != null){
-            filters.put("freeShiping", freeShiping);
-        }
-        if(prestige != null){
-            filters.put("prestige", prestige);
-        }
-        return this.productService.getProducts(filters, order);
+    public List<ProductListDTO> getProducts(@RequestParam HashMap<String, String> filters) throws FilterNotValidException {
+        System.out.println(filters);
+        return this.productService.getProducts(filters);
     }
 
 }
