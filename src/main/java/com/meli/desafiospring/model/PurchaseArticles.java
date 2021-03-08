@@ -8,11 +8,11 @@ import java.util.List;
 
 @Getter @Setter
 public class PurchaseArticles {
-    private List<ProductTicketDTO> articles;
+    private List<IndividualPurchase> articles;
 
     public PurchaseArticles(){}
 
-    public PurchaseArticles(List<ProductTicketDTO> articles) {
+    public PurchaseArticles(List<IndividualPurchase> articles) {
         this.articles = articles;
     }
 }

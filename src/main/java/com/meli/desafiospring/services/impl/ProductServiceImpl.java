@@ -2,6 +2,7 @@ package com.meli.desafiospring.services.impl;
 
 import com.meli.desafiospring.exceptions.NotEnoughProductsException;
 import com.meli.desafiospring.exceptions.NotFoundProductException;
+import com.meli.desafiospring.model.IndividualPurchase;
 import com.meli.desafiospring.model.ProductDAO;
 import com.meli.desafiospring.model.PurchaseArticles;
 import com.meli.desafiospring.model.dto.BuyOrderDTO;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,25 +44,40 @@ public class ProductServiceImpl implements ProductService {
     public BuyOrderDTO purchaseItems(PurchaseArticles products) throws NotFoundProductException, NotEnoughProductsException {
         List<Integer> ids = products.getArticles()
                 .stream().map(p -> p.getId()).collect(Collectors.toList());
+
         List<ProductDAO> productDAOS = this.productRepository.getByIds(ids);
-        HashMap<Integer, Integer> prices = new HashMap<>();
-        HashMap<Integer, Integer> stock = new HashMap<>();
+
+        Map<Integer, Integer> prices = new HashMap<>();
+        Map<Integer, Integer> stock = new HashMap<>();
         productDAOS.stream().forEach(p -> prices.put(p.getId(), p.getPrice()));
         productDAOS.stream().forEach(p -> stock.put(p.getId(), p.getQuantity()));
+
         Integer total = products.getArticles().stream()
                 .map(p -> p.getQuantity() * prices.get(p.getId()))
                 .reduce(0, (i1, i2) -> i1 + i2);
-        for(ProductTicketDTO productTicketDTO: products.getArticles()){
-            if(stock.get(productTicketDTO.getId()) < productTicketDTO.getQuantity()){
-                throw new NotEnoughProductsException(productTicketDTO.getQuantity() +
-                        " units of product with id " + productTicketDTO.getId() +
+
+        Map<Integer, Integer> amountOrderedByProductId = new HashMap<>();
+        for(IndividualPurchase individualPurchase: products.getArticles()){
+            if(stock.get(individualPurchase.getId()) < individualPurchase.getQuantity()){
+                throw new NotEnoughProductsException(individualPurchase.getQuantity() +
+                        " units of product with id " + individualPurchase.getId() +
                         " are intended to be purchased and there are only " +
-                        stock.get(productTicketDTO.getId()) + " units available");
+                        stock.get(individualPurchase.getId()) + " units available");
             }
+            amountOrderedByProductId.put(individualPurchase.getId(), individualPurchase.getQuantity());
         }
-        BuyOrderDTO buyOrderDTO = new BuyOrderDTO(this.purchases, products.getArticles(), total,
+
+        List<ProductTicketDTO> productTicketDTOList = productDAOS.stream()
+                .map(p -> new ProductTicketDTO(p.getId(), p.getName(), p.getBrand(), amountOrderedByProductId.get(p.getId())))
+                .collect(Collectors.toList());
+        BuyOrderDTO buyOrderDTO = new BuyOrderDTO(this.purchases, productTicketDTOList, total,
                 new StatusCodeDTO(HttpStatus.OK, "The purchase was done successfully"));
         this.purchases++;
         return buyOrderDTO;
+    }
+
+    @Override
+    public BuyOrderDTO addItemsToShoppingCart(PurchaseArticles products) {
+        return null;
     }
 }

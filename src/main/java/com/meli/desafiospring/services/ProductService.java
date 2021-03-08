@@ -14,5 +14,6 @@ public interface ProductService {
 
     public List<ProductListDTO> getProducts(HashMap<String, Object> filters, Integer order);
     public BuyOrderDTO purchaseItems(PurchaseArticles products) throws NotFoundProductException, NotEnoughProductsException;
+    public BuyOrderDTO addItemsToShoppingCart(PurchaseArticles products);
 
 }
