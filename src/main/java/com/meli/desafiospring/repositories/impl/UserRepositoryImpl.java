@@ -2,10 +2,13 @@ package com.meli.desafiospring.repositories.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.meli.desafiospring.exceptions.FilterNotExistException;
 import com.meli.desafiospring.model.UserDao;
 import com.meli.desafiospring.repositories.UserRepository;
+import com.meli.desafiospring.utils.FilterUserRepositoryUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
@@ -13,15 +16,22 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
     private HashMap<Integer, UserDao> users;
+    private HashMap<String, Function<FilterUserRepositoryUtil, Boolean>> filters;
+    @Value( "${users-json}" )
     private String filename;
 
     public UserRepositoryImpl() throws IOException {
+        System.out.println(filename);
+        this.addFilters();
         this.filename = "src/main/resources/static/users.json";
         this.users = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -49,6 +59,20 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<UserDao> filterByEmail(String email) {
         return this.users.values().stream().filter(u -> u.getEmail().equals(email)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDao> getUsers(HashMap<String, Object> filters) throws FilterNotExistException {
+        List<UserDao> userDaos = this.users.values().stream().collect(Collectors.toList());
+        for(Map.Entry<String, Object> entry: filters.entrySet()){
+            if(this.filters.get(entry.getKey()) == null){
+                throw new FilterNotExistException("Filter with name " + entry.getKey() + " is not valid");
+            }
+            userDaos = userDaos.stream().filter(u -> this.filters.get(entry.getKey())
+                    .apply(new FilterUserRepositoryUtil(u, entry.getValue())))
+                    .collect(Collectors.toList());
+        }
+        return userDaos;
     }
 
     private void writeInFile() {
@@ -82,4 +106,36 @@ public class UserRepositoryImpl implements UserRepository {
         return jsonObject;
     }
 
+
+    private void addFilters(){
+        this.filters = new HashMap<>();
+        this.filters.put("id", (FilterUserRepositoryUtil filter) ->
+                filter.getProductDAO().getId().equals((Integer) filter.getFilter()));
+        this.filters.put("name", (FilterUserRepositoryUtil filter) ->
+                filter.getProductDAO()
+                        .getName()
+                        .toLowerCase(Locale.ROOT)
+                        .equals((String) filter.getFilter()));
+        this.filters.put("email", (FilterUserRepositoryUtil filter) ->
+                filter.getProductDAO()
+                        .getEmail()
+                        .toLowerCase(Locale.ROOT)
+                        .equals((String) filter.getFilter()));
+        this.filters.put("country", (FilterUserRepositoryUtil filter) ->
+                filter.getProductDAO()
+                        .getCountry()
+                        .toLowerCase(Locale.ROOT)
+                        .equals((String) filter.getFilter()));
+        this.filters.put("province", (FilterUserRepositoryUtil filter) ->
+                filter.getProductDAO()
+                        .getProvince()
+                        .toLowerCase(Locale.ROOT)
+                        .equals((String) filter.getFilter()));
+        this.filters.put("city", (FilterUserRepositoryUtil filter) ->
+                filter.getProductDAO()
+                        .getCity()
+                        .toLowerCase(Locale.ROOT)
+                        .equals((String) filter.getFilter()));
+
+    }
 }
