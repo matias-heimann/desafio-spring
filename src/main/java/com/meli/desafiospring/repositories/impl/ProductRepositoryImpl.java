@@ -52,7 +52,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public List<ProductDAO> getByIds(List<Integer> ids) throws NotFoundProductException {
+    public List<ProductDAO> getByIds(Set<Integer> ids) throws NotFoundProductException {
         List<ProductDAO> productDAOS = new LinkedList<>();
         for(Integer i: ids){
             ProductDAO productDAO = this.products.get(i);

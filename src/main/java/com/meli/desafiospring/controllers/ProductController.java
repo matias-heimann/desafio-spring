@@ -18,14 +18,14 @@ import java.util.List;
 import java.util.Locale;
 
 @RestController
-@RequestMapping("/api/v1")
-public class ProductController {
+@RequestMapping("/api/v1/articles")
+public class ProductController extends BaseController{
 
     @Autowired
     private ProductService productService;
 
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/articles")
+    @GetMapping("")
     public List<ProductListDTO> getProducts(@RequestParam(defaultValue = "", required = false) String category,
                                             @RequestParam(defaultValue = "", required = false) String name,
                                             @RequestParam(defaultValue = "", required = false) String brand,
@@ -61,18 +61,6 @@ public class ProductController {
             filters.put("prestige", prestige);
         }
         return this.productService.getProducts(filters, order);
-    }
-
-    @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/purchase-request")
-    public BuyOrderDTO purchaseItems(@RequestBody PurchaseArticles products) throws NotFoundProductException,
-            NotEnoughProductsException {
-        return this.productService.purchaseItems(products);
-    }
-
-    @ExceptionHandler(BaseException.class)
-    public ResponseEntity<StatusCodeDTO> handleException(BaseException baseException){
-        return new ResponseEntity<>(new StatusCodeDTO(baseException.getStatus(), baseException.getMessage()), baseException.getStatus());
     }
 
 }
