@@ -25,6 +25,16 @@ public class ProductController extends BaseController{
     @Autowired
     private ProductService productService;
 
+
+    /**
+     * End point for product list with orders and filters.
+     * Possible filters: id, name, category, brand, price, maxPrice, minPrice, freeShiping and prestige.
+     * Possible orders: 0 (alphabetically by name(desc)), 1 (alphabetically by name (desc)),
+     * 2 (ordered by descending price), 3 (ordered by ascending price), 4 or default by prestige.
+     * @param filters
+     * @return list of products
+     * @throws FilterNotValidException
+     */
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("")
     public List<ProductListDTO> getProducts(@RequestParam HashMap<String, String> filters) throws FilterNotValidException {

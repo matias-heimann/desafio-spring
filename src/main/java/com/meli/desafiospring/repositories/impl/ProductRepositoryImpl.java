@@ -79,6 +79,10 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     private void addFilters(){
         filters = new HashMap<>();
+        filters.put("id", (FilterProductRepositoryUtil filter) -> filter
+                .getProductDAO()
+                .getId()
+                .equals(Integer.valueOf(filter.getFilter().toString())));
         filters.put("name", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getName().toLowerCase(Locale.ROOT)

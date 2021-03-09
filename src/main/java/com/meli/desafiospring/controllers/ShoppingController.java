@@ -18,6 +18,13 @@ public class ShoppingController extends BaseController{
     @Autowired
     private ShoppingCartService shoppingCartService;
 
+    /**
+     * Add items to the shopping cart, if there isn't an open shopping cart it creates one.
+     * @param products
+     * @return Order of products
+     * @throws NotFoundProductException
+     * @throws NotEnoughProductsException
+     */
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("")
     public BuyOrderDTO purchaseItems(@RequestBody PurchaseArticles products) throws NotFoundProductException,
@@ -25,6 +32,12 @@ public class ShoppingController extends BaseController{
         return this.shoppingCartService.addItemsToList(products);
     }
 
+    /**
+     * Close purchase request and saves the shopping request.
+     * @return
+     * @throws NotShoppingCartOpen
+     * @throws NotFoundProductException
+     */
     @PostMapping("/end")
     public BuyOrderDTO purchaseItems() throws NotShoppingCartOpen, NotFoundProductException {
         return this.shoppingCartService.finishBuyOrder();
