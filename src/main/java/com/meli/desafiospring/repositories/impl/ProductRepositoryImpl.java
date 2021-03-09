@@ -91,18 +91,18 @@ public class ProductRepositoryImpl implements ProductRepository {
                 .getProductDAO()
                 .getBrand().toLowerCase(Locale.ROOT)
                 .equals(filter.getFilter().toString().toLowerCase(Locale.ROOT)));
-        filters.put("maxPrice", (FilterProductRepositoryUtil filter) -> filter
+        filters.put("price", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getPrice()
                 .equals(Integer.valueOf(filter.getFilter().toString())));
         filters.put("maxPrice", (FilterProductRepositoryUtil filter) -> (filter
                 .getProductDAO()
                 .getPrice()
-                .compareTo(Integer.valueOf(filter.getFilter().toString())) < 0));
+                .compareTo(Integer.valueOf(filter.getFilter().toString())) <= 0));
         filters.put("minPrice", (FilterProductRepositoryUtil filter) -> (filter
                 .getProductDAO()
                 .getPrice()
-                .compareTo(Integer.valueOf(filter.getFilter().toString())) > 0));
+                .compareTo(Integer.valueOf(filter.getFilter().toString())) >= 0));
         filters.put("freeShiping", (FilterProductRepositoryUtil filter) -> filter
                 .getProductDAO()
                 .getFreeShiping()
