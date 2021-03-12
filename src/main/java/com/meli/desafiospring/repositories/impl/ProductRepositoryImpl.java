@@ -10,6 +10,7 @@ import com.meli.desafiospring.utils.FilterProductRepositoryUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -25,9 +26,13 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Value("${products-json}")
     private String filename;
 
+    public ProductRepositoryImpl(){}
 
-    public ProductRepositoryImpl() throws IOException {
-        this.filename = "src/main/resources/static/products.json";
+    public ProductRepositoryImpl(String filename){this.filename = filename;}
+
+    @PostConstruct
+    public void postConstruct() throws IOException {
+        System.out.println(this.filename);
         products = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
         List<ProductDAO> productList = objectMapper.readValue(new File(filename),

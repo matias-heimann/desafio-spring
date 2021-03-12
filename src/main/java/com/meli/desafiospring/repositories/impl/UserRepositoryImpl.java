@@ -14,6 +14,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -31,14 +32,18 @@ public class UserRepositoryImpl implements UserRepository {
     @Value("${users-json}")
     private String filename;
 
-    public UserRepositoryImpl() throws IOException {
-        filename = "src/main/resources/static/users.json";
+    public UserRepositoryImpl(){}
+
+    public UserRepositoryImpl(String filename){this.filename = filename;}
+
+    @PostConstruct
+    public void print() throws IOException {
         this.addFilters();
         this.users = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
         List<UserDao> userList = objectMapper.readValue(new File(this.filename),
                 new TypeReference<>() {
-        });
+                });
         userList.forEach(u -> this.users.put(u.getId(), u));
     }
 

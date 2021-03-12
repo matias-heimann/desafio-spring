@@ -22,9 +22,11 @@ import java.util.Locale;
 @RequestMapping("/api/v1/articles")
 public class ProductController extends BaseController{
 
-    @Autowired
     private ProductService productService;
 
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
 
     /**
      * End point for product list with orders and filters.

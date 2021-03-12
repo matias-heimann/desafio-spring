@@ -1,0 +1,10 @@
+[{
+  "id": 3,
+  "freeShiping": true,
+  "category": "Deportes",
+  "name": "Zapatillas Deportivas",
+  "brand": "Nike",
+  "price": 14000,
+  "quantity": 4,
+  "prestige": 5
+}]
