@@ -41,6 +41,8 @@ public class TestProductControllers {
     private final String FILTERED_BY_CATEGORY_AND_PRICE = "src/test/resources/static/productsFilteredByCategoryAndProducts.json";
     private final String ORDERED_ALPHABETICALLY = "src/test/resources/static/productsOrderedAlphabetically.json";
     private final String ORDERED_ANTI_ALPHABETICALLY = "src/test/resources/static/productsOrderedAntiAlphabetically.json";
+    private final String ORDERED_BY_PRICE_DESC = "src/test/resources/static/productsOrderedByPriceDesc.json";
+    private final String ORDERED_BY_PRICE_ASC = "src/test/resources/static/productsOrderedByPriceAsc.json";
 
     @MockBean
     private ProductRepository productRepository;
@@ -153,5 +155,66 @@ public class TestProductControllers {
         Assertions.assertIterableEquals(expected, actual);
     }
 
+    @Test
+    public void testGetProductsByPriceDesc() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ProductDAO> productDAOList = objectMapper.readValue(new File(ORDERED_BY_PRICE_DESC),
+                new TypeReference<>(){});
+
+        Mockito.doReturn(productDAOList).when(productRepository).getWithFilterAndOrder(new HashMap<>(), 3);
+        MvcResult mvcResult = this.mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/v1/articles?order=3").accept(MediaType.ALL)
+        ).andReturn();
+
+
+        List<ProductListDTO> actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<>(){});
+        List<ProductListDTO> expected = objectMapper.readValue(new File(ORDERED_BY_PRICE_DESC),
+                new TypeReference<>(){});
+        Assertions.assertIterableEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetProductsByPriceAsc() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ProductDAO> productDAOList = objectMapper.readValue(new File(ORDERED_BY_PRICE_ASC),
+                new TypeReference<>(){});
+
+        Mockito.doReturn(productDAOList).when(productRepository).getWithFilterAndOrder(new HashMap<>(), 2);
+        MvcResult mvcResult = this.mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/v1/articles?order=2").accept(MediaType.ALL)
+        ).andReturn();
+
+
+        List<ProductListDTO> actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<>(){});
+        List<ProductListDTO> expected = objectMapper.readValue(new File(ORDERED_BY_PRICE_ASC),
+                new TypeReference<>(){});
+        Assertions.assertIterableEquals(expected, actual);
+    }
+
+    @Test
+    public void testNonExistentFilter() throws Exception {
+        HttpUriRequest httpUriRequest = new HttpGet("http://localhost:8080/api/v1/articles?nullFilter=asd");
+        HttpClient client = new DefaultHttpClient();
+        HttpResponse response = client.execute(httpUriRequest);
+        Assertions.assertEquals(400, response.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    public void testInvalidValueForFilter() throws Exception {
+        HttpUriRequest httpUriRequest = new HttpGet("http://localhost:8080/api/v1/articles?price=asd");
+        HttpClient client = new DefaultHttpClient();
+        HttpResponse response = client.execute(httpUriRequest);
+        Assertions.assertEquals(400, response.getStatusLine().getStatusCode());
+    }
+
+    @Test
+    public void testInvalidOrderValue() throws Exception {
+        HttpUriRequest httpUriRequest = new HttpGet("http://localhost:8080/api/v1/articles?order=asd");
+        HttpClient client = new DefaultHttpClient();
+        HttpResponse response = client.execute(httpUriRequest);
+        Assertions.assertEquals(400, response.getStatusLine().getStatusCode());
+    }
 
 }
