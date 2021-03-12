@@ -2,6 +2,7 @@ package com.meli.desafiospring;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.meli.desafiospring.controllers.ProductController;
 import com.meli.desafiospring.exceptions.FilterNotValidException;
 import com.meli.desafiospring.model.ProductDAO;
 import com.meli.desafiospring.model.dto.ProductListDTO;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -37,6 +39,8 @@ public class TestProductControllers {
     private final String ORDERED_BY_PRESTIGE = "src/test/resources/static/allProductsOrderedByPrestige.json";
     private final String FILTERED_BY_CATEGORY = "src/test/resources/static/filteredByCategoryProducts.json";
     private final String FILTERED_BY_CATEGORY_AND_PRICE = "src/test/resources/static/productsFilteredByCategoryAndProducts.json";
+    private final String ORDERED_ALPHABETICALLY = "src/test/resources/static/productsOrderedAlphabetically.json";
+    private final String ORDERED_ANTI_ALPHABETICALLY = "src/test/resources/static/productsOrderedAntiAlphabetically.json";
 
     @MockBean
     private ProductRepository productRepository;
@@ -73,7 +77,7 @@ public class TestProductControllers {
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("category", "herramientas");
-        Mockito.when(productRepository.getWithFilterAndOrder(hashMap, 4)).thenReturn(productDAOList);
+        Mockito.doReturn(productDAOList).when(productRepository).getWithFilterAndOrder(hashMap, 4);
 
         MvcResult mvcResult = this.mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/v1/articles?category=herramientas").accept(MediaType.ALL)
@@ -96,7 +100,7 @@ public class TestProductControllers {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("category", "herramientas");
         hashMap.put("price", "14000");
-        Mockito.when(productRepository.getWithFilterAndOrder(hashMap, 4)).thenReturn(productDAOList);
+        Mockito.doReturn(productDAOList).when(productRepository).getWithFilterAndOrder(hashMap, 4);
 
         MvcResult mvcResult = this.mockMvc.perform(
                 MockMvcRequestBuilders.get("/api/v1/articles?category=herramientas&price=14000").accept(MediaType.ALL)
@@ -106,6 +110,45 @@ public class TestProductControllers {
         List<ProductListDTO> actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
                 new TypeReference<>(){});
         List<ProductListDTO> expected = objectMapper.readValue(new File(FILTERED_BY_CATEGORY_AND_PRICE),
+                new TypeReference<>(){});
+        Assertions.assertIterableEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetProductsAlphabetically() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ProductDAO> productDAOList = objectMapper.readValue(new File(ORDERED_ALPHABETICALLY),
+                new TypeReference<>(){});
+
+        Mockito.doReturn(productDAOList).when(productRepository).getWithFilterAndOrder(new HashMap<>(), 0);
+
+        MvcResult mvcResult = this.mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/v1/articles?order=0").accept(MediaType.ALL)
+        ).andReturn();
+
+
+        List<ProductListDTO> actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<>(){});
+        List<ProductListDTO> expected = objectMapper.readValue(new File(ORDERED_ALPHABETICALLY),
+                new TypeReference<>(){});
+        Assertions.assertIterableEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetProductsAntiAlphabetically() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ProductDAO> productDAOList = objectMapper.readValue(new File(ORDERED_ANTI_ALPHABETICALLY),
+                new TypeReference<>(){});
+
+        Mockito.doReturn(productDAOList).when(productRepository).getWithFilterAndOrder(new HashMap<>(), 1);
+        MvcResult mvcResult = this.mockMvc.perform(
+                MockMvcRequestBuilders.get("/api/v1/articles?order=1").accept(MediaType.ALL)
+        ).andReturn();
+
+
+        List<ProductListDTO> actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<>(){});
+        List<ProductListDTO> expected = objectMapper.readValue(new File(ORDERED_ANTI_ALPHABETICALLY),
                 new TypeReference<>(){});
         Assertions.assertIterableEquals(expected, actual);
     }
