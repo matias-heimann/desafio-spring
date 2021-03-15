@@ -28,11 +28,13 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     public ProductRepositoryImpl(){}
 
-    public ProductRepositoryImpl(String filename){this.filename = filename;}
+    public ProductRepositoryImpl(String filename) throws IOException {
+        this.filename = filename;
+        this.postConstruct();
+    }
 
     @PostConstruct
-    public void postConstruct() throws IOException {
-        System.out.println(this.filename);
+    private void postConstruct() throws IOException {
         products = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
         List<ProductDAO> productList = objectMapper.readValue(new File(filename),
@@ -51,6 +53,9 @@ public class ProductRepositoryImpl implements ProductRepository {
 
     @Override
     public List<ProductDAO> getWithFilterAndOrder(HashMap<String, String> filters, Integer order) throws FilterNotValidException {
+        if(filters == null || order == null){
+            throw new FilterNotValidException("Filters and order cannot be null");
+        }
         List<ProductDAO> productsAux = this.products.values().stream().collect(Collectors.toList());
         for(Map.Entry<String, String> entry: filters.entrySet()){
             if(this.filters.get(entry.getKey()) == null){
@@ -70,7 +75,10 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public List<ProductDAO> getByIds(Set<Integer> ids) throws NotFoundProductException {
+    public List<ProductDAO> getByIds(Set<Integer> ids) throws NotFoundProductException, FilterNotValidException {
+        if(ids == null){
+            throw new FilterNotValidException("List of ids cannot be null");
+        }
         List<ProductDAO> productDAOS = new LinkedList<>();
         for(Integer i: ids){
             ProductDAO productDAO = this.products.get(i);

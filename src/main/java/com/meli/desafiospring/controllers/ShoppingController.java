@@ -1,5 +1,6 @@
 package com.meli.desafiospring.controllers;
 
+import com.meli.desafiospring.exceptions.FilterNotValidException;
 import com.meli.desafiospring.exceptions.NotEnoughProductsException;
 import com.meli.desafiospring.exceptions.NotFoundProductException;
 import com.meli.desafiospring.exceptions.NotShoppingCartOpen;
@@ -28,7 +29,7 @@ public class ShoppingController extends BaseController{
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("")
     public BuyOrderDTO purchaseItems(@RequestBody PurchaseArticles products) throws NotFoundProductException,
-            NotEnoughProductsException {
+            NotEnoughProductsException, FilterNotValidException {
         return this.shoppingCartService.addItemsToList(products);
     }
 
@@ -39,7 +40,7 @@ public class ShoppingController extends BaseController{
      * @throws NotFoundProductException
      */
     @PostMapping("/end")
-    public BuyOrderDTO purchaseItems() throws NotShoppingCartOpen, NotFoundProductException {
+    public BuyOrderDTO purchaseItems() throws NotShoppingCartOpen, NotFoundProductException, FilterNotValidException {
         return this.shoppingCartService.finishBuyOrder();
     }
 

@@ -11,5 +11,5 @@ import java.util.Set;
 public interface ProductRepository {
     public List<ProductDAO> getAll();
     public List<ProductDAO> getWithFilterAndOrder(HashMap<String, String> filters, Integer order) throws FilterNotValidException;
-    public List<ProductDAO> getByIds(Set<Integer> ids) throws NotFoundProductException;
+    public List<ProductDAO> getByIds(Set<Integer> ids) throws NotFoundProductException, FilterNotValidException;
 }

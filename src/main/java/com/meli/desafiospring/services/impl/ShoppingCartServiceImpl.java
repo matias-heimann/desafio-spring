@@ -1,5 +1,6 @@
 package com.meli.desafiospring.services.impl;
 
+import com.meli.desafiospring.exceptions.FilterNotValidException;
 import com.meli.desafiospring.exceptions.NotEnoughProductsException;
 import com.meli.desafiospring.exceptions.NotFoundProductException;
 import com.meli.desafiospring.exceptions.NotShoppingCartOpen;
@@ -34,7 +35,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
 
     @Override
-    public BuyOrderDTO addItemsToList(PurchaseArticles products) throws NotFoundProductException, NotEnoughProductsException {
+    public BuyOrderDTO addItemsToList(PurchaseArticles products) throws NotFoundProductException, NotEnoughProductsException, FilterNotValidException {
         ShoppingCartDao shoppingCartDao = this.shoppingRepository.getOpenShoppingCart();
         if(shoppingCartDao == null){
             shoppingCartDao = new ShoppingCartDao();
@@ -90,7 +91,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public BuyOrderDTO finishBuyOrder() throws NotShoppingCartOpen, NotFoundProductException {
+    public BuyOrderDTO finishBuyOrder() throws NotShoppingCartOpen, NotFoundProductException, FilterNotValidException {
         ShoppingCartDao shoppingCartDao = this.shoppingRepository.getOpenShoppingCart();
         if(shoppingCartDao == null){
             throw new NotShoppingCartOpen("There is no open shopping cart");

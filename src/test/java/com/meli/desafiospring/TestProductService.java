@@ -4,6 +4,7 @@ import com.meli.desafiospring.controllers.ProductController;
 import com.meli.desafiospring.exceptions.FilterNotValidException;
 import com.meli.desafiospring.model.ProductDAO;
 import com.meli.desafiospring.model.dto.ProductListDTO;
+import com.meli.desafiospring.model.dto.ProductTicketDTO;
 import com.meli.desafiospring.repositories.ProductRepository;
 import com.meli.desafiospring.services.ProductService;
 import com.meli.desafiospring.services.impl.ProductServiceImpl;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -83,6 +85,27 @@ public class TestProductService {
         hashMap.put("invalidFilter", "not a filter");
         Mockito.when(productRepository.getWithFilterAndOrder(hashMap, 4)).thenThrow(FilterNotValidException.class);
         Assertions.assertThrows(FilterNotValidException.class, () -> productService.getProducts(hashMap));
+    }
+
+    @Test
+    public void testNullFilter(){
+        Assertions.assertThrows(FilterNotValidException.class, () -> productService.getProducts(null));
+    }
+
+    @Test
+    public void testValidOrder() throws FilterNotValidException {
+        List<ProductDAO> products = new LinkedList<>();
+        products.add(new ProductDAO(0, "p1", "c1", "b1", 1000, true, 10, 5));
+        products.add(new ProductDAO(2, "p2", "c1", "b2", 6000, false, 20, 4));
+        products.add(new ProductDAO(1, "p3", "c2", "b2", 5000, true, 10, 5));
+        products.add(new ProductDAO(3, "p4", "c2", "b2", 5000, true, 10, 4));
+
+        HashMap<String, String> hashMap = new HashMap<>();
+
+        List<ProductListDTO> expected = products.stream().map(p -> new ProductListDTO(p)).collect(Collectors.toList());
+        hashMap.put("order", "0");
+        Mockito.when(productRepository.getWithFilterAndOrder(hashMap, 0)).thenReturn(products);
+        Assertions.assertIterableEquals(expected, productService.getProducts(hashMap));
     }
 
 }
