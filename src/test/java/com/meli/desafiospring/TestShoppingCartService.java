@@ -150,6 +150,7 @@ public class TestShoppingCartService {
         Assert.assertEquals(expected, this.shoppingCartService.finishBuyOrder());
     }
 
+    @Test
     public void testCloseShoppingCartWhenThereIsNoCartOpen(){
         Mockito.when(this.shoppingRepository.getOpenShoppingCart()).thenReturn(null);
         Assert.assertThrows(NotShoppingCartOpen.class, () -> this.shoppingCartService.finishBuyOrder());
