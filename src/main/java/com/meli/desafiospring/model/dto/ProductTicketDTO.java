@@ -34,4 +34,14 @@ public class ProductTicketDTO {
     public int hashCode() {
         return Objects.hash(id, name, brand, quantity);
     }
+
+    @Override
+    public String toString() {
+        return "ProductTicketDTO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", brand='" + brand + '\'' +
+                ", quantity=" + quantity +
+                '}';
+    }
 }

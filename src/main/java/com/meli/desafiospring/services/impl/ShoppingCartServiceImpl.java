@@ -37,6 +37,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public BuyOrderDTO addItemsToList(PurchaseArticles products) throws NotFoundProductException, NotEnoughProductsException, FilterNotValidException {
+        if(products == null){
+            throw new NotEnoughProductsException("List of products can't be null");
+        }
+
+        if(products.getArticles().size() == 0){
+            throw new NotEnoughProductsException("There must be at least one article");
+        }
+
         ShoppingCartDao shoppingCartDao = this.shoppingRepository.getOpenShoppingCart();
         if(shoppingCartDao == null){
             shoppingCartDao = new ShoppingCartDao();

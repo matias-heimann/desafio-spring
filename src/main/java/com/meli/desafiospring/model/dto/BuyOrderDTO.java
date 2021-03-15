@@ -33,4 +33,14 @@ public class BuyOrderDTO {
     public int hashCode() {
         return Objects.hash(id, articles, total, statusCodeDTO);
     }
+
+    @Override
+    public String toString() {
+        return "BuyOrderDTO{" +
+                "id=" + id +
+                ", articles=" + articles +
+                ", total=" + total +
+                ", statusCodeDTO=" + statusCodeDTO +
+                '}';
+    }
 }
