@@ -27,12 +27,13 @@ import java.util.stream.Collectors;
 @Service
 public class ShoppingCartServiceImpl implements ShoppingCartService {
 
-    @Autowired
     private ShoppingRepository shoppingRepository;
-
-    @Autowired
     private ProductRepository productRepository;
 
+    public ShoppingCartServiceImpl(ShoppingRepository shoppingRepository, ProductRepository productRepository) {
+        this.shoppingRepository = shoppingRepository;
+        this.productRepository = productRepository;
+    }
 
     @Override
     public BuyOrderDTO addItemsToList(PurchaseArticles products) throws NotFoundProductException, NotEnoughProductsException, FilterNotValidException {
