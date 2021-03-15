@@ -193,28 +193,5 @@ public class TestProductControllers {
         Assertions.assertIterableEquals(expected, actual);
     }
 
-    @Test
-    public void testNonExistentFilter() throws Exception {
-        HttpUriRequest httpUriRequest = new HttpGet("http://localhost:8080/api/v1/articles?nullFilter=asd");
-        HttpClient client = new DefaultHttpClient();
-        HttpResponse response = client.execute(httpUriRequest);
-        Assertions.assertEquals(400, response.getStatusLine().getStatusCode());
-    }
-
-    @Test
-    public void testInvalidValueForFilter() throws Exception {
-        HttpUriRequest httpUriRequest = new HttpGet("http://localhost:8080/api/v1/articles?price=asd");
-        HttpClient client = new DefaultHttpClient();
-        HttpResponse response = client.execute(httpUriRequest);
-        Assertions.assertEquals(400, response.getStatusLine().getStatusCode());
-    }
-
-    @Test
-    public void testInvalidOrderValue() throws Exception {
-        HttpUriRequest httpUriRequest = new HttpGet("http://localhost:8080/api/v1/articles?order=asd");
-        HttpClient client = new DefaultHttpClient();
-        HttpResponse response = client.execute(httpUriRequest);
-        Assertions.assertEquals(400, response.getStatusLine().getStatusCode());
-    }
 
 }
