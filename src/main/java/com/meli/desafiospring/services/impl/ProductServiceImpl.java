@@ -9,15 +9,28 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
-    @Autowired
+
     private ProductRepository productRepository;
+
+    public ProductServiceImpl(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
     @Override
     public List<ProductListDTO> getProducts(HashMap<String, String> filters) throws FilterNotValidException {
+        if(filters == null){
+            throw new FilterNotValidException("The filters can't be null");
+        }
+
+        if(filters.entrySet().stream().anyMatch(f -> f.getKey() == null || f.getValue() == null)){
+            throw new FilterNotValidException("There is a filter key or value that is null");
+        }
+
         int order = 4;
         if(filters.get("order") != null){
             try {

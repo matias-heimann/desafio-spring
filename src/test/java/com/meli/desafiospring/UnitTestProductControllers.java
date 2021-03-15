@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -39,15 +40,10 @@ public class UnitTestProductControllers {
     @Mock
     private ProductService productServiceMock;
 
-    private ProductRepository productRepository;
-
-    private final String ORDERED_BY_PRESTIGE = "src/test/resources/static/allProductsOrderedByPrestige.json";
-
     @BeforeEach
     public void setControllers() throws IOException {
         initMocks(this);
         this.productController = new ProductController(this.productServiceMock);
-        this.productRepository = new ProductRepositoryImpl("src/test/resources/static/allProducts.json");
     }
 
     @Test
@@ -62,12 +58,48 @@ public class UnitTestProductControllers {
     }
 
     @Test
-    public void testRepositoryGetAll() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<ProductDAO> expected = objectMapper.readValue(new File(ORDERED_BY_PRESTIGE),
-                new TypeReference<>(){});
-        System.out.println(this.productRepository);
-        Assertions.assertIterableEquals(this.productRepository.getAll(), expected);
+    public void testGetProductsFilteredByCategory() throws FilterNotValidException {
+        List<ProductListDTO> products = new LinkedList<>();
+        products.add(new ProductListDTO(0, "p1", "c1", "b1", 1000, true, 10, 5));
+        products.add(new ProductListDTO(2, "p3", "c1", "b2", 6000, false, 20, 5));
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("categoria", "c1");
+        Mockito.when(productServiceMock.getProducts(hashMap)).thenReturn(products);
+        Assertions.assertIterableEquals(products, this.productController.getProducts(hashMap));
     }
+
+    @Test
+    public void testGetProductsFilteredByCategoryAndBrand() throws FilterNotValidException {
+        List<ProductListDTO> products = new LinkedList<>();
+        products.add(new ProductListDTO(0, "p1", "c1", "b1", 1000, true, 10, 5));
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("categoria", "c1");
+        hashMap.put("brand", "b1");
+        Mockito.when(productServiceMock.getProducts(hashMap)).thenReturn(products);
+        Assertions.assertIterableEquals(products, this.productController.getProducts(hashMap));
+    }
+
+    @Test
+    public void testGetProductsWithNullMap() throws FilterNotValidException {
+        Mockito.when(productServiceMock.getProducts(null)).thenThrow(FilterNotValidException.class);
+        Assertions.assertThrows(FilterNotValidException.class, () -> this.productController.getProducts(null));
+    }
+
+    @Test
+    public void testInvalidFilter() throws FilterNotValidException {
+        Mockito.when(productServiceMock.getProducts(null)).thenThrow(FilterNotValidException.class);
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("nullFilter", "nullValue");
+        Assertions.assertThrows(FilterNotValidException.class, () -> this.productController.getProducts(null));
+    }
+
+    @Test
+    public void testInvalidOrderValue() throws FilterNotValidException {
+        Mockito.when(productServiceMock.getProducts(null)).thenThrow(FilterNotValidException.class);
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("order", "6");
+        Assertions.assertThrows(FilterNotValidException.class, () -> this.productController.getProducts(null));
+    }
+
 
 }
